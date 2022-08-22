@@ -4,6 +4,8 @@ import { PhonebookForm } from './PhonebookForm/PhonebookForm';
 import { Contacts } from './Contacts/Contacts';
 import { Filter } from './Filter/Filter';
 
+const MY_CONTACTS = 'myContacts';
+
 export class App extends Component {
   state = {
     contacts: [
@@ -16,16 +18,33 @@ export class App extends Component {
     name: '',
   };
 
+  componentDidMount() {
+    if (!localStorage.getItem(MY_CONTACTS)) {
+      return;
+    }
+    try {
+      this.setState({
+        contacts: JSON.parse(localStorage.getItem(MY_CONTACTS)),
+      });
+    } catch (error) {
+      console.error(error.message);
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.contacts !== this.state.contacts) {
+      localStorage.setItem(MY_CONTACTS, JSON.stringify(this.state.contacts));
+    }
+  }
+
   reviewNameInContacts = name => {
     return this.state.contacts.find(contact => contact.name === name);
   };
 
   addContact = contact => {
-    // console.log(contact);
     this.setState(prevState => ({
       contacts: [contact, ...prevState.contacts],
     }));
-    console.log(this.state);
   };
 
   removeContact = removeContactId => {
